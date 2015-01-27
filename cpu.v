@@ -13,6 +13,7 @@ module cpu
   wire [31:0] immediate_value;
   wire [5:0] src_reg1, src_reg2, dst_reg;
   wire immediate;
+  wire [31:0] jump_address;
 
   assign debug_inst = current_instruction;
   assign alu_in = immediate ? immediate_value : reg2;
@@ -28,14 +29,16 @@ module cpu
     src_reg2,
     dst_reg,
     immediate_value,
-    immediate
+    immediate,
+    do_jump,
+    jump_address
   );
 
   always @(posedge clk) begin
       if (reset) begin
          pc = 0;
       end else begin
-         pc = pc + 1;
+         pc = do_jump ? jump_address : (pc + 1);
       end
   end
 endmodule
