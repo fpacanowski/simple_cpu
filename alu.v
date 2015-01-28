@@ -8,6 +8,7 @@ module alu(aluop, a, b, out);
     case(aluop)
       `ALUOP_ADD : out = a + b;
       `ALUOP_SUB : out = a - b;
+      `ALUOP_COMP : out = (a != b);
       default : out = 32'bz;
     endcase
 endmodule
