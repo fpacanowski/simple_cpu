@@ -18,37 +18,55 @@ module cpu
   wire [3:0] aluop;
 
   assign debug_inst = current_instruction;
-  assign alu_in = immediate ? immediate_value : reg2;
+  assign immediate_value = { {16{current_instruction[15]}}, current_instruction[15:0] }; //sign extension
 
-  imem imem0(pc, current_instruction);
   //regfile regfile0(clk, reset, 1, current_instruction[9:5], current_instruction[4:0], 1 
-  regfile regfile0(clk, reset, write_enable, src_reg1, src_reg2, dst_reg, alu_out, reg1, reg2, debug_data);
-  alu alu0(aluop, reg1, alu_in, alu_out);
   //dmem(clk, memory_write, memory_address, dmem_in, dmem_out);
 
   //assign dmem_in = alu_out;
   //assign reg_write_data
 
-  cpu_control cpu_control0(
-    current_instruction,
-    src_reg1,
-    src_reg2,
-    dst_reg,
-    immediate_value,
-    immediate,
-    do_jump,
-    jump_address,
-    aluop,
-    alu_jump,
-    write_enable
+  //components initialization
+
+  imem imem0(pc, current_instruction);
+  alu alu0(aluop, reg1, alu_in, alu_out);
+  
+  regfile regfile0(
+    .clk(clk),
+    .reset(reset),
+    .write_enable(write_enable),
+    .read_addr1(src_reg1),
+    .read_addr2(src_reg2),
+    .write_addr(dst_reg),
+    .write_data(alu_out),
+    .read_data1(reg1),
+    .read_data2(reg2),
+    .debug_data(debug_data)
   );
+  
+  cpu_control cpu_control0(
+    .instruction(current_instruction),
+    .src_reg1(src_reg1),
+    .src_reg2(src_reg2),
+    .dst_reg(dst_reg),
+    .immediate(immediate),
+    .jump(jump),
+    .branch(branch),
+    .jump_address(jump_address),
+    .aluop(aluop),
+    .write_enable(write_enable)
+  );
+  
+  assign alu_in = immediate ? immediate_value : reg2;
+
+  //program counter logic
 
   always @(posedge clk) begin
       if (reset) begin
          pc = 0;
       end else begin
-         if(do_jump) begin
-           pc = ((alu_out && alu_jump) || !alu_jump) ? jump_address : (pc + 1);
+         if(branch || jump) begin
+           pc = ((branch && alu_out) || jump) ? jump_address : (pc + 1);
          end else begin
            pc = pc+1;
          end

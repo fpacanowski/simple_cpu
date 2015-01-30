@@ -1,7 +1,7 @@
 module regfile
   (input         clk,
    input         reset,
-   input         write_enabled,
+   input         write_enable,
    input  [5:0]  read_addr1,
    input  [5:0]  read_addr2,
    input  [5:0]  write_addr,
@@ -31,7 +31,7 @@ module regfile
 	    regs[i] = 0;
 	 end
       end else begin
-	 if (write_enabled) regs[write_addr] = write_data;
+	 if (write_enable) regs[write_addr] = write_data;
       end
    end
 endmodule
