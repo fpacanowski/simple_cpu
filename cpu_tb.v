@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 `include "defines.v"
 
 module test;
@@ -13,7 +14,7 @@ module test;
     #1 reset = 1;
     #10;
     #1 reset = 0;
-    #100;
+    #50000;
     $finish;
   end
 
