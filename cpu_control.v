@@ -14,7 +14,7 @@ module cpu_control
   output reg write_mem,
   output reg read_mem);
 
-  wire [5:0] opcode;
+  wire [5:0] opcode, alu_function;
   wire [5:0] rs, rt, rd;
 
   reg unknown_instruction = 0;
@@ -24,6 +24,7 @@ module cpu_control
   assign rt = instruction[20:16];
   assign rd = instruction[15:11];
   assign immediate_value = instruction[15:0];
+  assign alu_function = instruction[5:0];
 
   always @(*) begin
     jump = 0;
@@ -37,7 +38,10 @@ module cpu_control
         src_reg2 = rt;
         dst_reg  = rd;
         immediate = 0;
-        aluop = `ALUOP_ADD;
+        case(alu_function)
+          6'b100000: aluop = `ALUOP_ADD;
+          6'b100100: aluop = `ALUOP_AND;
+        endcase
         write_reg = 1;
       end
       6'b000010: begin //J 

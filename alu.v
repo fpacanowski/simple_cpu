@@ -9,6 +9,7 @@ module alu(aluop, a, b, out);
       `ALUOP_ADD : out = a + b;
       `ALUOP_SUB : out = a - b;
       `ALUOP_NEQ : out = (a != b);
+      `ALUOP_AND : out = (a & b);
       default : out = 32'bz;
     endcase
 endmodule

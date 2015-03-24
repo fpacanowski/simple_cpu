@@ -1,11 +1,11 @@
 `include "defines.v"
-`include "dmem.v"
 
 module cpu
  (input         clk,
-  input         reset,
-  output [31:0] debug_inst,
-  output [31:0] debug_data);
+  input         reset_button,
+  input         rx,
+  output        tx,
+  output [7:0] debug_data);
 
   reg [31:0] pc;
   wire [31:0] reg1, reg2, alu_out, alu_in;
@@ -20,15 +20,11 @@ module cpu
   wire [31:0] dmem_out;
   wire [31:0] reg_write_data;
 
-  wire jump, branch, write_mem, write_reg;
+  wire jump, branch, write_mem, write_reg, read_mem;
+  wire reset;
 
-  assign debug_inst = current_instruction;
   assign immediate_value = { {16{current_instruction[15]}}, current_instruction[15:0] }; //sign extension
-
-  //regfile regfile0(clk, reset, 1, current_instruction[9:5], current_instruction[4:0], 1 
-
-  //assign dmem_in = alu_out;
-  //assign reg_write_data
+  assign reset = !reset_button;
 
   //components initialization
 
@@ -55,7 +51,10 @@ module cpu
     .write_enable(write_mem),
     .addr(mem_addr),
     .write_data(dmem_in),
-    .read_data(dmem_out)
+    .read_data(dmem_out),
+    .rx(rx),
+    .tx(tx),
+    .rst(reset)
   );
   
   regfile regfile0(

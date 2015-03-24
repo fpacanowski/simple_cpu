@@ -1,0 +1,78 @@
+`timescale 1ns / 1ps
+module uart_test
+  (input         clk,
+   input         reset,
+   output [7:0]  char,
+   input srx_pad_i,
+   output stx_pad_o
+   );
+
+   reg [7:0] 	 data [0:6];
+   reg [3:0]     idx = 0;
+
+   reg [7:0] tx_byte;
+   reg [7:0] rx_byte;
+   reg transmit;
+
+  assign rx = srx_pad_i;
+  assign stx_pad_o = tx;
+
+  wire rx, tx;
+
+   uart #(.CLOCK_DIVIDE( 10 )) uart0(
+    .clk(clk),
+    .rst(reset), 
+    .rx(rx), 
+    .tx(tx), 
+    .transmit(transmit), 
+    .tx_byte(tx_byte),
+    .is_transmitting(is_transmitting)
+/*    .received(received), 
+    .rx_byte(rx_byte), 
+    .is_receiving, 
+    .recv_error*/
+    );
+
+   uart #(.CLOCK_DIVIDE( 10 )) uart1(
+    .clk(clk),
+    .rst(reset),
+    .rx(tx)
+   );
+
+   assign char = data[idx];
+   //assign char = 8'd72;
+
+  reg wait_state = 0;
+
+   always @(posedge clk) begin
+     if(!wait_state) begin
+       if(!is_transmitting) begin
+         tx_byte <= data[idx];
+         transmit <= 1;
+         idx <= (idx == 5) ? 0 : idx+1;
+         wait_state <= 1;
+       end else begin
+         transmit <= 0;
+       end
+     end else begin
+       wait_state <= 0;
+     end
+   end
+
+   always @(posedge clk) begin
+      if (reset) begin
+         idx = 0;
+         data[0] = 8'd72;
+         data[1] = 8'd69;
+         data[2] = 8'd76;
+         data[3] = 8'd76;
+         data[4] = 8'd79;
+         data[5] = 8'd10;
+      end
+   end
+/*
+   always @(char) begin
+     //$display("char = %d\n", char);
+   end
+*/
+endmodule

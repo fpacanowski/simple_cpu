@@ -9,7 +9,7 @@ module uart_test
    );
 
   parameter UART_CLOCK_DIVIDE = 1302;
-  parameter DELAY = 500000;
+  parameter DELAY = 5000;
 
    reg [7:0] 	 data [0:6];
    reg [3:0]     idx = 0;
@@ -27,7 +27,7 @@ module uart_test
     //.transmit(1), 
     //.tx_byte(8'd72),
     .transmit(transmit), 
-    .tx_byte(data[idx]),
+    .tx_byte(8'd72),
     .is_transmitting(is_transmitting),
     .received(received), 
     .rx_byte(rx_byte)

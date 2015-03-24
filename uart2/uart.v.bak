@@ -79,8 +79,6 @@ always @(posedge clk) begin
 	if (rst) begin
 		recv_state = RX_IDLE;
 		tx_state = TX_IDLE;
-		tx_clk_divider = CLOCK_DIVIDE;
-		tx_out = 1'b1;
 	end
 	
 	// The clk_divider counter counts down from
